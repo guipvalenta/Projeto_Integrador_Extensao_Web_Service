@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Área Administrativa</title>
+    <link rel="stylesheet" href="login_admin.css">
+</head>
+<body>
+
+<div class="overlay">
+
+    <div class="login-box">
+
+        <div class="logo">⛪</div>
+
+        <h1>Área Administrativa</h1>
+
+        <form id="login-form">
+
+            <input type="email" name="email" placeholder="E-mail do administrador" required>
+
+            <input type="password" name="senha" placeholder="Senha" required>
+
+            <button type="submit">Entrar</button>
+
+        </form>
+
+        <p id="login-message" style="margin-top: 1rem; color: #ffd76a; font-size: 1.3rem;"></p>
+
+        <script>
+            const form = document.getElementById('login-form');
+            const message = document.getElementById('login-message');
+
+            form.addEventListener('submit', async (event) => {
+                event.preventDefault();
+                message.textContent = 'Validando acesso...';
+
+                const body = new URLSearchParams(new FormData(form)).toString();
+                const response = await fetch('/api/admin/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' },
+                    body
+                });
+
+                const result = await response.json();
+
+                if (response.ok && result.success) {
+                    message.style.color = '#9effb3';
+                    message.textContent = 'Acesso liberado. Redirecionando...';
+                    window.location.href = '/painel_admin.html';
+                } else {
+                    message.style.color = '#ffb4b4';
+                    message.textContent = result.message || 'Falha ao entrar.';
+                }
+            });
+        </script>
+
+    </div>
+
+</div>
+
+</body>
+</html>

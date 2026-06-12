@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel Administrativo</title>
+
+    <link rel="stylesheet" href="painel_admin.css">
+</head>
+<body>
+
+<header>
+    <h1>Painel Administrativo</h1>
+
+    <a href="/" class="sair">
+        Voltar ao Site
+    </a>
+</header>
+
+<main>
+
+    <div class="card">
+        <h2>Pedidos de Oração</h2>
+        <p id="total-pedidos">Carregando...</p>
+    </div>
+
+    <div id="lista-pedidos"></div>
+
+</main>
+
+<script>
+    async function carregarPedidos() {
+        const total = document.getElementById('total-pedidos');
+        const lista = document.getElementById('lista-pedidos');
+
+        try {
+            const response = await fetch('/api/admin/pedidos');
+            const data = await response.json();
+
+            if (!response.ok || !data.success) {
+                throw new Error(data.message || 'Não foi possível carregar os pedidos.');
+            }
+
+            total.textContent = 'Total de pedidos: ' + data.total;
+
+            if (!data.pedidos || data.pedidos.length === 0) {
+                lista.innerHTML = '<div class="pedido"><p>Nenhum pedido encontrado.</p></div>';
+                return;
+            }
+
+            lista.innerHTML = data.pedidos.map((pedido) => `
+                <article class="pedido" data-id="${pedido.id}">
+                    <h3>${pedido.nome || 'Anônimo'}</h3>
+                    <p><strong>E-mail:</strong> ${pedido.email || 'Não informado'}</p>
+                    <p><strong>Categoria:</strong> ${pedido.categoria || 'Geral'}</p>
+                    <p><strong>Pedido:</strong> ${pedido.pedido || pedido.titulo || 'Sem descrição'}</p>
+                    <p><strong>Data:</strong> ${pedido.data_envio || '---'}</p>
+                    <p class="status"><strong>Status:</strong> ${pedido.status_tes ? 'Aprovado' : 'Pendente'}</p>
+                    <div class="acoes-pedido">
+                        <button class="btn-acoes" data-action="aprovar" data-id="${pedido.id}">Aprovar</button>
+                        <button class="btn-acoes btn-excluir" data-action="excluir" data-id="${pedido.id}">Excluir</button>
+                    </div>
+                    <label class="label-resposta" for="resposta-${pedido.id}">Resposta do administrador</label>
+                    <textarea id="resposta-${pedido.id}" class="campo-resposta">${pedido.resposta || ''}</textarea>
+                    <button class="btn-acoes btn-responder" data-action="responder" style="display: none;"  data-id="${pedido.id}">Enviar resposta</button>
+                    <p class="mensagem" id="msg-${pedido.id}"></p>
+                </article>
+            `).join('');
+
+            document.querySelectorAll('[data-action="aprovar"]').forEach((botao) => {
+                botao.addEventListener('click', async () => {
+                    const id = botao.dataset.id;
+                    const msg = document.getElementById('msg-' + id);
+                    msg.textContent = 'Aprovando...';
+                    const response = await fetch('/api/admin/pedidos/' + id + '/aprovar', { method: 'POST' });
+                    const result = await response.json();
+                    msg.textContent = result.message || 'Pedido aprovado.';
+                    msg.style.color = result.success ? '#9effb3' : '#ffb4b4';
+                    carregarPedidos();
+                });
+            });
+
+            document.querySelectorAll('[data-action="responder"]').forEach((botao) => {
+                botao.addEventListener('click', async () => {
+                    const id = botao.dataset.id;
+                    const resposta = document.getElementById('resposta-' + id).value;
+                    const msg = document.getElementById('msg-' + id);
+                    msg.textContent = 'Enviando resposta...';
+                    const response = await fetch('/api/admin/pedidos/' + id + '/responder', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' },
+                        body: new URLSearchParams({ resposta }).toString()
+                    });
+                    const result = await response.json();
+                    msg.textContent = result.message || 'Resposta enviada.';
+                    msg.style.color = result.success ? '#9effb3' : '#ffb4b4';
+                    carregarPedidos();
+                });
+            });
+
+            document.querySelectorAll('[data-action="excluir"]').forEach((botao) => {
+                botao.addEventListener('click', async () => {
+                    const id = botao.dataset.id;
+                    const msg = document.getElementById('msg-' + id);
+                    msg.textContent = 'Excluindo...';
+                    const response = await fetch('/api/admin/pedidos/' + id + '/excluir', { method: 'DELETE' });
+                    const result = await response.json();
+                    msg.textContent = result.message || 'Pedido excluído.';
+                    msg.style.color = result.success ? '#9effb3' : '#ffb4b4';
+                    carregarPedidos();
+                });
+            });
+        } catch (error) {
+            total.textContent = 'Não foi possível carregar os pedidos.';
+            lista.innerHTML = '<div class="pedido"><p>' + error.message + '</p></div>';
+        }
+    }
+
+    carregarPedidos();
+</script>
+
+</body>
+</html>

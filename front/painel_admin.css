@@ -1,0 +1,95 @@
+body{
+    background:#050505;
+    color:white;
+    font-family:Arial,sans-serif;
+}
+
+header{
+    background:#000;
+    padding:20px 50px;
+
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+
+    border-bottom:1px solid #222;
+}
+
+header h1{
+    font-size:28px;
+}
+
+.sair{
+    color:white;
+    text-decoration:none;
+}
+
+main{
+    max-width:1200px;
+    margin:auto;
+    padding:40px;
+}
+
+.card{
+    background:#111;
+    padding:25px;
+    border-radius:15px;
+    margin-bottom:25px;
+}
+
+.pedido{
+    background:#111;
+    padding:25px;
+    border-radius:15px;
+    margin-bottom:20px;
+
+    border:1px solid #222;
+}
+
+.acoes-pedido{
+    display:flex;
+    gap:10px;
+    margin-top:15px;
+}
+
+.btn-acoes,
+.btn-excluir{
+    background:#fff;
+    color:black;
+    border:none;
+    padding:10px 18px;
+    border-radius:8px;
+    cursor:pointer;
+    font-weight:600;
+}
+
+.btn-responder{
+    margin-top:10px;
+}
+
+.campo-resposta{
+    width:100%;
+    min-height:80px;
+    margin-top:8px;
+    padding:12px;
+    border-radius:8px;
+    border:1px solid #333;
+    background:#0f0f0f;
+    color:white;
+}
+
+.label-resposta{
+    display:block;
+    margin-top:15px;
+    color:#ccc;
+    font-size:14px;
+}
+
+.status{
+    color:#9effb3;
+}
+
+.mensagem{
+    margin-top:10px;
+    min-height:20px;
+}
