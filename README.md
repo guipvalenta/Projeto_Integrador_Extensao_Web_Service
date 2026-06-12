@@ -34,8 +34,3 @@ Backend Java que consiste em:
    ```
    http://localhost:8080/
    ```
-
-## Configurações:
-
-- O backend grava os pedidos na tabela **testemunho** do banco **igreja** do XAMPP.
-- Os logs aparecem no terminal durante a execução.
